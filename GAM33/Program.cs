@@ -1,9 +1,13 @@
 
 using Gam33.Repositries.Data;
+using Gam33.Repositries.Identity;
 using Gam33.Repositries.Repos;
 using GAM33.Helpers;
+using Gma33.Core.Entites.IdentityEntites;
 using Gma33.Core.Interfaces;
 using Gma33.Core.Specfication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GAM33
@@ -25,6 +29,12 @@ namespace GAM33
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+            builder.Services.AddDbContext<IdentityContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+            });
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                             .AddEntityFrameworkStores<IdentityContext>();
 
             builder.Services.AddScoped(typeof(IGenaricRepo<>), typeof(GenaricRepo<>));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -42,13 +52,18 @@ namespace GAM33
             var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
             var _Dbcontext = services.GetRequiredService<StoreContext>();
+            var UserManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var _IdentityDbContext = services.GetRequiredService<IdentityContext>();
 
-           
+
             var LoogerFactory = services.GetRequiredService<ILoggerFactory>();
             try
             {
                 await _Dbcontext.Database.MigrateAsync();
                 await StoreContextSeed.DataSeedAsync(_Dbcontext);
+                await _IdentityDbContext.Database.MigrateAsync();
+                await IdentityDBContextSeed.IdentityDataSeed(UserManager);
+
             }
             catch (Exception ex)
             {

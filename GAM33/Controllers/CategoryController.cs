@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GAM33.Dtos;
-using Gma33.Core.Entites;
+using Gma33.Core.Entites.StoreEntites;
 using Gma33.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

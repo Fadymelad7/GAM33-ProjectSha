@@ -1,5 +1,5 @@
 ﻿using Gam33.Repositries.Data;
-using Gma33.Core.Entites;
+using Gma33.Core.Entites.StoreEntites;
 using Gma33.Core.Interfaces;
 using Gma33.Core.Specfication;
 using Microsoft.EntityFrameworkCore;

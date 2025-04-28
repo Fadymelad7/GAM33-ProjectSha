@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GAM33.Dtos;
-using Gma33.Core.Entites;
+using Gma33.Core.Entites.StoreEntites;
 
 namespace GAM33.Helpers
 {

@@ -1,4 +1,4 @@
-﻿using Gma33.Core.Entites;
+﻿using Gma33.Core.Entites.StoreEntites;
 using Gma33.Core.Specfication;
 using System;
 using System.Collections.Generic;
