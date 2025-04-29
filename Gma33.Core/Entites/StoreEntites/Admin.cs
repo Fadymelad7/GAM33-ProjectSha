@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gma33.Core.Entites
+namespace Gma33.Core.Entites.StoreEntites
 {
-    public class Admin:BaseEntity
+    public class Admin : BaseEntity
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

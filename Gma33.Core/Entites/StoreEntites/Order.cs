@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gma33.Core.Entites
+namespace Gma33.Core.Entites.StoreEntites
 {
     public class Order : BaseEntity
     {
         public decimal TotalPrice { get; set; }
 
-        public DateTime OrderDate { get; set; }= DateTime.UtcNow;
+        public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public int? AdminId { get; set; }
         public Admin? Admin { get; set; }
 

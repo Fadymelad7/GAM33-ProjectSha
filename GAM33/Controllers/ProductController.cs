@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GAM33.Dtos;
-using Gma33.Core.Entites;
+using Gma33.Core.Entites.StoreEntites;
 using Gma33.Core.Interfaces;
 using Gma33.Core.Specfication.ProductSpec;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +25,7 @@ namespace GAM33.Controllers
         {
             var spec = new ProductWithCategorySpec(prams);
             var SpecCount = new ProductWithCategoryAndBrandPaginationCountSpec(prams);
-            var Products = await _repo.GetAllWithSpecAsync(spec);
+            var Products = await _repo.GetAllWithSpecAsync(spec); 
 
             var mapp = _mapper.Map<IReadOnlyList<ProductDto>>(Products);
 

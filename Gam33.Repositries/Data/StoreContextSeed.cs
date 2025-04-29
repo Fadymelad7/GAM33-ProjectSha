@@ -1,5 +1,5 @@
 ﻿using EFCore.BulkExtensions;
-using Gma33.Core.Entites;
+using Gma33.Core.Entites.StoreEntites;
 using System;
 using System.Collections.Generic;
 using System.Linq;

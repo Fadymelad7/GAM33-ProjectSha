@@ -1,4 +1,4 @@
-﻿using Gma33.Core.Entites;
+﻿using Gma33.Core.Entites.StoreEntites;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

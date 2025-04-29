@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Gma33.Core.Entites
+namespace Gma33.Core.Entites.StoreEntites
 {
     public class Product : BaseEntity
     {
@@ -26,7 +26,7 @@ namespace Gma33.Core.Entites
         //public Admin Admin { get; set; }
 
         [JsonIgnore]
-        public ICollection<OrderProduct> OrderProducts { get; set; }=new HashSet<OrderProduct>();
+        public ICollection<OrderProduct> OrderProducts { get; set; } = new HashSet<OrderProduct>();
         [JsonIgnore]
 
         public ICollection<CartProduct> CartProducts { get; set; } = new HashSet<CartProduct>();
