@@ -5,7 +5,9 @@ using Gam33.Repositries.Repos;
 using GAM33.Helpers;
 using Gma33.Core.Entites.IdentityEntites;
 using Gma33.Core.Interfaces;
+using Gma33.Core.Interfaces.IdentityServicesInterfaces;
 using Gma33.Core.Specfication;
+using Gma33.Services.TokenServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -34,9 +36,11 @@ namespace GAM33
                 options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
             });
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                               .AddDefaultTokenProviders()
                              .AddEntityFrameworkStores<IdentityContext>();
+                            
 
-            builder.Services.AddScoped(typeof(IGenaricRepo<>), typeof(GenaricRepo<>));
+            builder.Services.AddScoped<IToken, TokenServices>();
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
