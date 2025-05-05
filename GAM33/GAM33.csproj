@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gam33.Repositries\Gam33.Repositries.csproj" />
+    <ProjectReference Include="..\Gma33.Services\Gma33.Services.csproj" />
   </ItemGroup>
 
 </Project>
