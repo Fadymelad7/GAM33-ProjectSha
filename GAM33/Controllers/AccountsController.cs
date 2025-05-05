@@ -1,11 +1,17 @@
-﻿using GAM33.Dtos;
+﻿using AutoMapper;
+using GAM33.Dtos;
 using GAM33.Exceptions;
+using GAM33.Helpers;
 using Gma33.Core.Entites.IdentityEntites;
 using Gma33.Core.Interfaces.IdentityServicesInterfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace GAM33.Controllers
 {
@@ -18,13 +24,20 @@ namespace GAM33.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IToken _token;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public AccountsController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IToken token, IConfiguration configuration)
+        public AccountsController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IToken token,
+            IConfiguration configuration,
+            IMapper mapper
+        )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _token = token;
-            this._configuration = configuration;
+            _configuration = configuration;
+            _mapper = mapper;
         }
         #endregion
 
@@ -61,6 +74,10 @@ namespace GAM33.Controllers
         {
             try
             {
+                if (CheckEmailIsExistAsync(model.Email).Result.Value)
+                {
+                    return BadRequest("Invalid User");
+                }
                 var user = new ApplicationUser()
                 {
                     Email = model.Email,
@@ -134,6 +151,82 @@ namespace GAM33.Controllers
 
             if (Result.Succeeded) return Ok("Password Reset Successful");
             return BadRequest("Invalid Data");
+        }
+        #endregion
+
+        #region Get Current User EndPoint
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("GetCurrentUser")]
+
+        public async Task<ActionResult> GetCurrentUser()
+        {
+            var Email = User.FindFirstValue(ClaimTypes.Email);
+
+            if (Email is null) return BadRequest("Invalid user");
+
+            var user = await _userManager.FindByEmailAsync(Email);
+            if (user == null) return BadRequest("Invalid user");
+
+            var ReturnedValue = new
+            {
+                DisplayName = user.DisplayName,
+                Email = user.Email,
+            };
+
+            return Ok(ReturnedValue);
+
+        }
+        #endregion
+
+        #region Get Current User Address EndPoint
+
+        [HttpGet("GetCurrentUserAddress")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+
+        public async Task<ActionResult<AddressDto>> GetCurrentUserAddress()
+        {
+            var user = await _userManager.FindEamilWithAddressAsync(User);
+            var MappAddress = _mapper.Map<Address, AddressDto>(user.Address);
+            return Ok(MappAddress);
+
+        }
+        #endregion
+
+        #region Update Current User Address EndPoint
+        [HttpPost("UpdateAddress")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<ActionResult<AddressDto>> UpdateUserAddress(AddressDto addressDto)
+        {
+            var user = await _userManager.FindEamilWithAddressAsync(User);
+            var NewAddress = _mapper.Map<Address>(addressDto);
+            NewAddress.Id = user.Address.Id;
+
+            user.Address = NewAddress;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded) return BadRequest("Invalid Data");
+
+            return Ok(addressDto);
+        }
+        #endregion
+
+        #region Check Email is Exist EndPoint
+
+        [HttpGet("IsEmailExist")]
+
+        public async Task<ActionResult<bool>> CheckEmailIsExistAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user is null)
+            {
+                return false;
+            }
+            return true;
         } 
         #endregion
 
