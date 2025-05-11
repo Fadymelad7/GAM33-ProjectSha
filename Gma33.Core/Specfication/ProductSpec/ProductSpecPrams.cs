@@ -11,12 +11,12 @@ namespace Gma33.Core.Specfication.ProductSpec
         public string? sort { get; set; }
         public string? Product { get; set; }
         public string? Category { get; set; }
-        private int PageSize = 30;
+        private int PageSize = 32;
 
         public int pagesize
         {
             get { return PageSize; }
-            set { PageSize = value > 30 ? 30 : value; }
+            set { PageSize = value < 32 ? 32 : value; }
         }
 
         public int PageIndex { get; set; } = 1;
