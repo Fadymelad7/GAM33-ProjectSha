@@ -5,10 +5,16 @@ using Gam33.Repositries.Repos;
 using GAM33.Helpers;
 using Gma33.Core.Entites.IdentityEntites;
 using Gma33.Core.Interfaces;
+using Gma33.Core.Interfaces.IdentityServicesInterfaces;
 using Gma33.Core.Specfication;
+using Gma33.Services.TokenServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 namespace GAM33
 {
@@ -34,14 +40,31 @@ namespace GAM33
                 options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
             });
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                               .AddDefaultTokenProviders()
                              .AddEntityFrameworkStores<IdentityContext>();
 
+
+            builder.Services.AddScoped<IToken, TokenServices>();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+               .AddJwtBearer(options =>
+               {
+                   options.TokenValidationParameters = new TokenValidationParameters()
+                   {
+                       ValidateIssuer = true,
+                       ValidIssuer = builder.Configuration["JwtToken:issuer"],
+                       ValidateAudience = true,
+                       ValidAudience = builder.Configuration["JwtToken:audience"],
+                       ValidateLifetime = true,
+                       ValidateIssuerSigningKey = true,
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtToken:Key"])),
+                       NameClaimType = ClaimTypes.Name,
+                       RoleClaimType = ClaimTypes.Role
+
+                   };
+               });
             builder.Services.AddScoped(typeof(IGenaricRepo<>), typeof(GenaricRepo<>));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-
             var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -54,8 +77,6 @@ namespace GAM33
             var _Dbcontext = services.GetRequiredService<StoreContext>();
             var UserManager = services.GetRequiredService<UserManager<ApplicationUser>>();
             var _IdentityDbContext = services.GetRequiredService<IdentityContext>();
-
-
             var LoogerFactory = services.GetRequiredService<ILoggerFactory>();
             try
             {
@@ -63,7 +84,6 @@ namespace GAM33
                 await StoreContextSeed.DataSeedAsync(_Dbcontext);
                 await _IdentityDbContext.Database.MigrateAsync();
                 await IdentityDBContextSeed.IdentityDataSeed(UserManager);
-
             }
             catch (Exception ex)
             {
